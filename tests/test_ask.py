@@ -10,10 +10,12 @@ from app.ask import Conversation, ask, chat_loop, format_usage
 
 
 def usage(prompt, output, total=None, thoughts=None):
+    if total is None and prompt is not None and output is not None:
+        total = prompt + output
     return SimpleNamespace(
         prompt_token_count=prompt,
         candidates_token_count=output,
-        total_token_count=total if total is not None else prompt + output,
+        total_token_count=total,
         thoughts_token_count=thoughts,
     )
 
