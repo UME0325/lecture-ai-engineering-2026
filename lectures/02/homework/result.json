@@ -1,0 +1,201 @@
+{
+  "config": {
+    "base_model": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "seed": 42,
+    "num_train_epochs": 4,
+    "warmup_steps": 10,
+    "lr": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "max_seq_len": 512,
+    "max_new_tokens": 256,
+    "gen": {
+      "do_sample": false
+    },
+    "sim_threshold": 0.5,
+    "repo": "https://github.com/UME0325/lecture-ai-engineering-2026",
+    "branch": "lec02",
+    "repo_commit": "9ea09b7"
+  },
+  "versions": {
+    "transformers": "5.18.0",
+    "peft": "0.21.1",
+    "trl": "1.14.2",
+    "torch": "2.11.0+cu130"
+  },
+  "data": {
+    "train": 201,
+    "valid": 12,
+    "test": 60,
+    "test_by_category": {
+      "seen": 10,
+      "paraphrase": 24,
+      "alias": 10,
+      "unknown_far": 8,
+      "unknown_near": 8
+    }
+  },
+  "train": {
+    "seconds": 541,
+    "steps": 104,
+    "losses": [
+      [
+        10,
+        2.5108
+      ],
+      [
+        20,
+        0.9669
+      ],
+      [
+        30,
+        0.702
+      ],
+      [
+        40,
+        0.5565
+      ],
+      [
+        50,
+        0.4397
+      ],
+      [
+        60,
+        0.2311
+      ],
+      [
+        70,
+        0.184
+      ],
+      [
+        80,
+        0.1486
+      ],
+      [
+        90,
+        0.1133
+      ],
+      [
+        100,
+        0.1067
+      ]
+    ]
+  },
+  "summaries": {
+    "base": {
+      "label": "base",
+      "n": 60,
+      "format_rate": 0.0,
+      "content_rate": 0.0,
+      "both_rate": 0.0,
+      "identified_rate": 0.183,
+      "mean_sim_gold": 0.088,
+      "seconds": 222.4
+    },
+    "search": {
+      "label": "search",
+      "n": 60,
+      "format_rate": 0.0,
+      "content_rate": 0.617,
+      "both_rate": 0.0,
+      "identified_rate": 0.667,
+      "mean_sim_gold": 0.723,
+      "seconds": 148.2
+    },
+    "lora": {
+      "label": "lora",
+      "n": 60,
+      "format_rate": 1.0,
+      "content_rate": 0.467,
+      "both_rate": 0.467,
+      "identified_rate": 0.583,
+      "mean_sim_gold": 0.468,
+      "seconds": 194.1
+    },
+    "lora_search": {
+      "label": "lora_search",
+      "n": 60,
+      "format_rate": 0.983,
+      "content_rate": 0.883,
+      "both_rate": 0.883,
+      "identified_rate": 0.9,
+      "mean_sim_gold": 0.931,
+      "seconds": 203.0
+    }
+  },
+  "content_rate_by_category": {
+    "base": {
+      "format": 0.0,
+      "seen": 0.0,
+      "paraphrase": 0.0,
+      "alias": 0.0,
+      "unknown_far": 0.0,
+      "unknown_near": 0.0
+    },
+    "search": {
+      "format": 0.0,
+      "seen": 1.0,
+      "paraphrase": 0.75,
+      "alias": 0.9,
+      "unknown_far": 0.0,
+      "unknown_near": 0.0
+    },
+    "lora": {
+      "format": 1.0,
+      "seen": 0.6,
+      "paraphrase": 0.5,
+      "alias": 0.1,
+      "unknown_far": 0.75,
+      "unknown_near": 0.38
+    },
+    "lora_search": {
+      "format": 0.98,
+      "seen": 1.0,
+      "paraphrase": 0.96,
+      "alias": 0.9,
+      "unknown_far": 1.0,
+      "unknown_near": 0.38
+    }
+  },
+  "fail_types": {
+    "base": {
+      "asserted_borrowed": 0,
+      "asserted_made_up": 15,
+      "escaped": 0,
+      "format_error": 9,
+      "inaccurate": 11,
+      "ok": 0,
+      "wrong_term": 25
+    },
+    "search": {
+      "asserted_borrowed": 0,
+      "asserted_made_up": 16,
+      "escaped": 0,
+      "format_error": 1,
+      "inaccurate": 3,
+      "ok": 37,
+      "wrong_term": 3
+    },
+    "lora": {
+      "asserted_borrowed": 0,
+      "asserted_made_up": 7,
+      "escaped": 2,
+      "format_error": 0,
+      "inaccurate": 7,
+      "ok": 28,
+      "wrong_term": 16
+    },
+    "lora_search": {
+      "asserted_borrowed": 1,
+      "asserted_made_up": 4,
+      "escaped": 0,
+      "format_error": 1,
+      "inaccurate": 1,
+      "ok": 53,
+      "wrong_term": 0
+    }
+  },
+  "regressed": [],
+  "executed_training_myself": true
+}
