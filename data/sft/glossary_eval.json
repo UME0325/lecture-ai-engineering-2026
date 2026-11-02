@@ -1,0 +1,426 @@
+{
+ "system": "あなたはAIエンジニアリング実践講座（AIE2026）の用語集の回答係です。用語の意味を聞かれたら、用語集の定義で答えてください。必ず JSON 1 行で答えます。形式: {\"answer\": 文字列, \"needs_review\": 真偽値}。用語集に無い用語は answer に『用語集に記載がありません。確認が必要です。』と書き、needs_review を true にします。",
+ "unknown_answer": "用語集に記載がありません。確認が必要です。",
+ "questions": [
+  {
+   "question": "「fetchサーバー」とは何ですか？",
+   "category": "seen",
+   "surface": "fetchサーバー",
+   "gold_id": "fetch-server",
+   "needs_review": false
+  },
+  {
+   "question": "「AIエージェント」とは何ですか？",
+   "category": "seen",
+   "surface": "AIエージェント",
+   "gold_id": "ai-agent",
+   "needs_review": false
+  },
+  {
+   "question": "「プロンプト」とは何ですか？",
+   "category": "seen",
+   "surface": "プロンプト",
+   "gold_id": "prompt",
+   "needs_review": false
+  },
+  {
+   "question": "「ツールの説明文」とは何ですか？",
+   "category": "seen",
+   "surface": "ツールの説明文",
+   "gold_id": "tool-description",
+   "needs_review": false
+  },
+  {
+   "question": "「ランク（LoRAのr）」とは何ですか？",
+   "category": "seen",
+   "surface": "ランク（LoRAのr）",
+   "gold_id": "lora-rank",
+   "needs_review": false
+  },
+  {
+   "question": "「LLM（大規模言語モデル）」とは何ですか？",
+   "category": "seen",
+   "surface": "LLM（大規模言語モデル）",
+   "gold_id": "llm",
+   "needs_review": false
+  },
+  {
+   "question": "「評価と改善のサイクル」とは何ですか？",
+   "category": "seen",
+   "surface": "評価と改善のサイクル",
+   "gold_id": "evaluation-loop",
+   "needs_review": false
+  },
+  {
+   "question": "「mcpServers設定」とは何ですか？",
+   "category": "seen",
+   "surface": "mcpServers設定",
+   "gold_id": "mcp-config",
+   "needs_review": false
+  },
+  {
+   "question": "「GitHub Codespaces」とは何ですか？",
+   "category": "seen",
+   "surface": "GitHub Codespaces",
+   "gold_id": "codespaces",
+   "needs_review": false
+  },
+  {
+   "question": "「devcontainer」とは何ですか？",
+   "category": "seen",
+   "surface": "devcontainer",
+   "gold_id": "devcontainer",
+   "needs_review": false
+  },
+  {
+   "question": "過学習って何？",
+   "category": "paraphrase",
+   "surface": "過学習",
+   "gold_id": "overfitting",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきた構造化出力がよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "構造化出力",
+   "gold_id": "structured-output",
+   "needs_review": false
+  },
+  {
+   "question": "評価と改善のサイクルを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "評価と改善のサイクル",
+   "gold_id": "evaluation-loop",
+   "needs_review": false
+  },
+  {
+   "question": "エージェントループって何？",
+   "category": "paraphrase",
+   "surface": "エージェントループ",
+   "gold_id": "agent-loop",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたレート制限がよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "レート制限",
+   "gold_id": "rate-limit",
+   "needs_review": false
+  },
+  {
+   "question": "Human-in-the-loopを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "Human-in-the-loop",
+   "gold_id": "human-in-the-loop",
+   "needs_review": false
+  },
+  {
+   "question": "Pydantic AIって何？",
+   "category": "paraphrase",
+   "surface": "Pydantic AI",
+   "gold_id": "pydantic-ai",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたガードレールがよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "ガードレール",
+   "gold_id": "guardrail",
+   "needs_review": false
+  },
+  {
+   "question": "AIエージェントを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "AIエージェント",
+   "gold_id": "ai-agent",
+   "needs_review": false
+  },
+  {
+   "question": "LoRAって何？",
+   "category": "paraphrase",
+   "surface": "LoRA",
+   "gold_id": "lora",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたdevcontainerがよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "devcontainer",
+   "gold_id": "devcontainer",
+   "needs_review": false
+  },
+  {
+   "question": "QLoRAを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "QLoRA",
+   "gold_id": "qlora",
+   "needs_review": false
+  },
+  {
+   "question": "ツールの説明文って何？",
+   "category": "paraphrase",
+   "surface": "ツールの説明文",
+   "gold_id": "tool-description",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたブランチがよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "ブランチ",
+   "gold_id": "branch",
+   "needs_review": false
+  },
+  {
+   "question": "AIエンジニアリングを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "AIエンジニアリング",
+   "gold_id": "ai-engineering",
+   "needs_review": false
+  },
+  {
+   "question": "APIキーって何？",
+   "category": "paraphrase",
+   "surface": "APIキー",
+   "gold_id": "api-key",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたランク（LoRAのr）がよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "ランク（LoRAのr）",
+   "gold_id": "lora-rank",
+   "needs_review": false
+  },
+  {
+   "question": "コーディングエージェントを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "コーディングエージェント",
+   "gold_id": "coding-agent",
+   "needs_review": false
+  },
+  {
+   "question": "既定モデルって何？",
+   "category": "paraphrase",
+   "surface": "既定モデル",
+   "gold_id": "default-model",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたAPIがよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "API",
+   "gold_id": "api",
+   "needs_review": false
+  },
+  {
+   "question": "GitHub Codespacesを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "GitHub Codespaces",
+   "gold_id": "codespaces",
+   "needs_review": false
+  },
+  {
+   "question": "Piって何？",
+   "category": "paraphrase",
+   "surface": "Pi",
+   "gold_id": "pi",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたシステムプロンプトがよく分かりません。どういうものですか？",
+   "category": "paraphrase",
+   "surface": "システムプロンプト",
+   "gold_id": "system-prompt",
+   "needs_review": false
+  },
+  {
+   "question": "プロンプトを一言で説明すると？",
+   "category": "paraphrase",
+   "surface": "プロンプト",
+   "gold_id": "prompt",
+   "needs_review": false
+  },
+  {
+   "question": "JSON出力って何？",
+   "category": "alias",
+   "surface": "JSON出力",
+   "gold_id": "structured-output",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたコードスペースがよく分かりません。どういうものですか？",
+   "category": "alias",
+   "surface": "コードスペース",
+   "gold_id": "codespaces",
+   "needs_review": false
+  },
+  {
+   "question": "ツールスキーマを一言で説明すると？",
+   "category": "alias",
+   "surface": "ツールスキーマ",
+   "gold_id": "tool-description",
+   "needs_review": false
+  },
+  {
+   "question": "mcp.jsonって何？",
+   "category": "alias",
+   "surface": "mcp.json",
+   "gold_id": "mcp-config",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたStreamable HTTPがよく分かりません。どういうものですか？",
+   "category": "alias",
+   "surface": "Streamable HTTP",
+   "gold_id": "mcp-transport",
+   "needs_review": false
+  },
+  {
+   "question": "HF Hubを一言で説明すると？",
+   "category": "alias",
+   "surface": "HF Hub",
+   "gold_id": "huggingface-hub",
+   "needs_review": false
+  },
+  {
+   "question": "instructionsって何？",
+   "category": "alias",
+   "surface": "instructions",
+   "gold_id": "system-prompt",
+   "needs_review": false
+  },
+  {
+   "question": "講座で出てきたgoogle-adkがよく分かりません。どういうものですか？",
+   "category": "alias",
+   "surface": "google-adk",
+   "gold_id": "adk",
+   "needs_review": false
+  },
+  {
+   "question": "lec03-startを一言で説明すると？",
+   "category": "alias",
+   "surface": "lec03-start",
+   "gold_id": "lec-start-tag",
+   "needs_review": false
+  },
+  {
+   "question": "devcontainer.jsonって何？",
+   "category": "alias",
+   "surface": "devcontainer.json",
+   "gold_id": "devcontainer",
+   "needs_review": false
+  },
+  {
+   "question": "強化学習って何？",
+   "category": "unknown_far",
+   "surface": "強化学習",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "講座で出てきたGANがよく分かりません。どういうものですか？",
+   "category": "unknown_far",
+   "surface": "GAN",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "拡散モデルを一言で説明すると？",
+   "category": "unknown_far",
+   "surface": "拡散モデル",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "ベイズ最適化って何？",
+   "category": "unknown_far",
+   "surface": "ベイズ最適化",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "講座で出てきたKubernetesがよく分かりません。どういうものですか？",
+   "category": "unknown_far",
+   "surface": "Kubernetes",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "勾配ブースティングを一言で説明すると？",
+   "category": "unknown_far",
+   "surface": "勾配ブースティング",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "交差検証って何？",
+   "category": "unknown_far",
+   "surface": "交差検証",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "講座で出てきたデータ拡張がよく分かりません。どういうものですか？",
+   "category": "unknown_far",
+   "surface": "データ拡張",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "DoRAって何？",
+   "category": "unknown_near",
+   "surface": "DoRA",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "講座で出てきた継続事前学習がよく分かりません。どういうものですか？",
+   "category": "unknown_near",
+   "surface": "継続事前学習",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "A2Aを一言で説明すると？",
+   "category": "unknown_near",
+   "surface": "A2A",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "LangGraphって何？",
+   "category": "unknown_near",
+   "surface": "LangGraph",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "講座で出てきたMCPインスペクターがよく分かりません。どういうものですか？",
+   "category": "unknown_near",
+   "surface": "MCPインスペクター",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "早期終了を一言で説明すると？",
+   "category": "unknown_near",
+   "surface": "早期終了",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "重み減衰って何？",
+   "category": "unknown_near",
+   "surface": "重み減衰",
+   "gold_id": null,
+   "needs_review": true
+  },
+  {
+   "question": "講座で出てきたGitHub Actionsがよく分かりません。どういうものですか？",
+   "category": "unknown_near",
+   "surface": "GitHub Actions",
+   "gold_id": null,
+   "needs_review": true
+  }
+ ]
+}
