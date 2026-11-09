@@ -1,0 +1,27 @@
+[tool call]   bash({"command": "find . -maxdepth 3 -not -path '*/.*'", "timeout": 30})
+[tool return] bash -> . ./scripts ./scripts/make_sft_dataset.py ./notebooks ./notebooks/lora_format_tuning.ipynb ./data ./data/glossary.json .…
+[tool call]   bash({"timeout": 30, "command": "git grep -i \"レベル\""})
+[tool return] bash -> README.md:宿題は「基礎・実装・発展」の3レベルがあり、どれか1つに取り組めば完了です。 app/ask.py:DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何ですか？" data/eval…
+[tool call]   read({"offset": 1, "limit": 100, "path": "data/glossary.json"})
+[tool return] read -> {   "version": "2026-draft-1",   "note": "AIE2026 第1〜4回・第6回の用語集（たたき台）。講義スライド確定後に内容を差し替える。",   "terms": [     {       "id…
+[tool call]   bash({"timeout": 30, "command": "git grep -n \"homework-levels\" data/glossary.json"})
+[tool return] bash -> data/glossary.json:429:      "id": "homework-levels", data/glossary.json:444:      "related": ["pull-request", "homework…
+[tool call]   read({"limit": 70, "path": "data/glossary.json", "offset": 410})
+[tool return] read ->     {       "id": "human-in-the-loop",       "term": "Human-in-the-loop",       "aliases": ["HITL", "人間による承認", "確認を挟む"],…
+[tool call]   read({"limit": 100, "path": "README.md", "offset": 1})
+[tool return] read -> # AIE2026 演習・宿題リポジトリ  AIエンジニアリング実践講座（AIE2026）の演習と宿題で使うリポジトリです。 講座を通して、**AIエンジニアリングの学習を支援するエージェント**を少しずつ育てていきます。  ## 想定する…
+[usage] turns(requests)=7 total_tokens=34453
+
+--- 最終回答 ---
+AIE2026（AIエンジニアリング実践講座）の講座や宿題にある「**3レベル**」とは、各回の宿題において用意されている**「基礎」「実装」「発展」の3段階の挑戦課題**のことです。
+
+主な特徴とルールは以下の通りです：
+
+1. **どれか1つで完了**
+   - 3つのレベル（基礎・実装・発展）をすべてやる必要はなく、**自分のスキルや興味に合わせてどれか1つを選んで取り組めば、その回の宿題は完了**となります。
+2. **レベルの目安**
+   - **基礎**：講義内容の理解確認や、基本的な操作・コードの模倣など
+   - **実装**：自分でコードを書いたり、機能を実際に拡張・修正したりする課題
+   - **発展**：より高度な調査、応用的な試行、新しいツールや別フレームワーク（例: Pydantic AIやMCPなど）の検証など
+3. **提出方法**
+   - 取り組んだ内容や結果、気づきなどは、各回の解答ファイル（`lectures/NN/answer.md`）に記入してプルリクエストで提出します（原則として採点は行われません）。
