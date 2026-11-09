@@ -1,4 +1,25 @@
-[usage] turns(requests)=1 total_tokens=0
+[tool call]   bash({"command": "find . -maxdepth 3 -not -path '*/.*'", "timeout": 30})
+[tool return] bash -> . ./scripts ./scripts/make_sft_dataset.py ./notebooks ./notebooks/lora_format_tuning.ipynb ./data ./data/glossary.json .…
+[tool call]   read({"path": "data/glossary.json", "limit": 100, "offset": 1})
+[tool return] read -> {   "version": "2026-draft-1",   "note": "AIE2026 第1〜4回・第6回の用語集（たたき台）。講義スライド確定後に内容を差し替える。",   "terms": [     {       "id…
+[tool call]   read({"offset": 101, "path": "data/glossary.json", "limit": 100})
+[tool return] read ->       "definition": "APIを呼び出す人を識別するための秘密の文字列。漏れると他人に利用枠を使われるため、コードに直接書かない、コミットしない、チャットに貼らない。本講座ではCodespaces secretに登録し、環…
+[tool call]   read({"path": "data/glossary.json", "limit": 100, "offset": 201})
+[tool return] read ->       "related": ["ai-agent", "harness"]     },     {       "id": "pretraining",       "term": "事前学習",       "aliases": …
+[usage] turns(requests)=5 total_tokens=20462
 
 --- 最終回答 ---
+AIエンジニアリング講座の用語集に基づき、LoRAとQLoRAの違いについて解説します。
 
+### LoRA と QLoRA の違い
+
+- **LoRA（Low-Rank Adaptation）**
+  - 事前学習済みのモデルの重み自体は固定（凍結）したまま、重みの更新分を「低ランク行列」と呼ばれる2つの小さな行列の積で近似して表現します。
+  - 学習するのはこの小さな行列のパラメータのみであるため、全パラメータを更新する通常のファインチューニングに比べて**必要なGPUメモリや保存容量を大幅に削減**できます。
+
+- **QLoRA（Quantized LoRA）**
+  - LoRAの仕組みをベースにしつつ、**ベースモデルの重みを4ビットなどに量子化**してメモリ消費量をさらに劇的に削減した上でLoRAの学習を行う手法です。
+  - これにより、より大きなモデルであっても、VRAMが限られた小さなGPU環境で効率的にファインチューニングを行うことが可能になります。
+
+---
+関連する回：第2回

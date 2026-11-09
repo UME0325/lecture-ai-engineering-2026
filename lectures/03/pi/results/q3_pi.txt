@@ -1,4 +1,58 @@
-[usage] turns(requests)=1 total_tokens=0
+[tool call]   bash({"command": "ls -la", "timeout": 30})
+[tool return] bash -> total 308 drwxrwxrwx+ 13 vscode root     4096 Nov  9 06:23 . drwxr-xrwx+  4 vscode root     4096 Nov  9 05:04 .. drwxrwx…
+[tool call]   bash({"command": "find lectures notebooks -type f", "timeout": 30})
+[tool return] bash -> lectures/04/problem.md lectures/04/answer.md lectures/04/reference/README.md lectures/04/reference/labels_instructor.jso…
+[tool call]   read({"path": "lectures/03/problem.md", "limit": 2000, "offset": 1})
+[tool return] read -> # 第3回 演習・宿題：学習支援エージェントを作る  ## この回のゴール  - エージェントが「モデル＋ループ＋ツール」でできていることを、自分のコードで確かめる - どのツールが、どの引数で呼ばれたかを読める - ツールを1つ追加できる…
+[tool call]   read({"path": "lectures/03/answer.md", "offset": 1, "limit": 2000})
+[tool return] read -> # 第3回 解答  ## 演習  - 第1回（素のLLM）とエージェントの回答の違い：   - 第1回の素のLLMは、講座を知らないまま「基礎・応用・発展」など一般論でもっともらしく答え、「どれか1つで完了」「採点しない」という肝心のルール…
+[usage] turns(requests)=5 total_tokens=22342
 
 --- 最終回答 ---
+第3回の宿題・演習の解答例（解説）は、リポジトリ内の **`lectures/03/answer.md`** に記載されています。
 
+以下に、各レベルの内容と解答のポイントをまとめました。
+
+---
+
+### 1. 演習のまとめ・比較ポイント
+- **素のLLM（第1回） vs エージェント（第3回）**:
+  - 素のLLMは講座の内容を知らないまま一般論でもっともらしく答えてしまう。
+  - エージェントは用語集（`search_glossary`）を検索してから回答し、「基礎・実装・発展からどれか1つ」「原則採点しない」などの正確なルールや「関連する回」を提示する。
+- **`--trace` で確認できること**:
+  - ツール呼び出し（例：`search_glossary({'query': '3レベル'})` や `search_glossary` の並列呼び出し）。
+  - LLMの呼び出し回数（`requests`）やトークン数の変化。
+- **追加した `make_quiz` ツール**:
+  - 「第2回の確認問題を出して」などの指示に対し、`make_quiz({'lecture': 2})` が呼ばれ、問題文のみを生成して答えをすぐに見せないようにする（docstring の設計が重要）。
+
+---
+
+### 2. 宿題の解答例（3つのレベルからいずれか1つ）
+
+宿題は**「基礎」「実装」「発展」**のいずれか1つを選択します。
+
+#### ① 基礎（INSTRUCTIONS や docstring の書き換え実験）
+- **内容**: `app/agent.py` の `INSTRUCTIONS` や、`app/tools.py` のツールの docstring を書き換え、同じ質問を `--trace` 付きで実行して挙動の変化を比べる。
+- **比べるポイント**:
+  - `INSTRUCTIONS` から「必ず search_glossary で確認する」の記述を消すと、検索せずに答えてしまうか？
+  - docstring の説明文を変えると、モデルがツールを選ぶ判断や引数（query の粒度など）がどう変わるか？
+
+#### ② 実装（`save_learning_log` と人による承認）
+- **内容**: 学習記録を保存するツール `save_learning_log` を作成し、Pydantic AI の `requires_approval=True` を設定する。
+- **ポイント**:
+  - エージェントの `output_type` に `[str, DeferredToolRequests]` を追加する。
+  - ツール呼び出し時に一度停止し、CLI側でユーザーの承認（`DeferredToolResults`）を得てから再開する流れを実装する。
+
+#### ③ 発展（(a) ADK での書き直し、または (b) Pi の利用とシステムプロンプトの比較）
+※ `lectures/03/answer.md` には **(b) Pi の実践例** が詳しく記載されています。
+- **内容**:
+  1. Codespaces で Pi コーディングエージェント（`@earendil-works/pi-coding-agent`）を動かす。
+  2. Pi のシステムプロンプト構造と、自作エージェントの `INSTRUCTIONS` を比較する。
+- **比較のポイント**:
+  - **役割と指示の分け方**: 自作エージェントは「いつ使うか（when）」を INSTRUCTIONS に書きがちだが、Pi はツールごとのスニペットやルール（`promptGuidelines`）として持たせている。
+  - **ツールの自動利用**: Pi は「確かめてから答えろ」と明記されていなくても、プログラミングやファイル操作の文脈で自然にツール（`read`, `grep`, `find` など）を使いこなす。
+  - **専用ツール vs 汎用エージェント**: 汎用エージェント（Pi）は柔軟で何でもできるが、探索に多くのトークンやターン数を消費する。一方、専用ツールを持つ自作エージェントは、コストや確実性（最短経路で正確に用語集を引くなど）に優れている。
+
+---
+
+詳細なコードスニペットや実験結果の数値、具体的な考察については、直接 **`lectures/03/answer.md`** ファイルをご参照ください。
