@@ -1,0 +1,14 @@
+[model] gemini-3.5-flash-lite
+それでは、第2回の確認問題を出します！
+
+**【確認問題】**
+「LoRA」の意味について、あなたの言葉で説明してみましょう。
+
+（考えて答えが出たら、ぜひ教えてくださいね！）
+
+関連する回：第2回
+
+--- trace ---
+[tool call]   make_quiz({'lecture': 2})
+[tool return] make_quiz -> {"question": "「LoRA」の意味は？", "answer": "事前学習済みの重みは固定したまま、重みの更新分を2つの小さな行列の積（低ランク行列）で表し、その小さな行列だけを学習するPEFT手法。学習するパラメータが少なく、…
+[usage] RunUsage(cost=Decimal('0.0004644'), details={'text_prompt_tokens': 998}, input_text_tokens=998, input_tokens=998, output_tokens=66, requests=2, tool_calls=1)
