@@ -21,5 +21,9 @@ echo "Q3 を Pi で実行"
 pi --mode json --model "google/$MODEL" "$q" > "$OUT/q3_pi.jsonl" 2> "$OUT/q3_pi.err"
 uv run -q python lectures/03/pi/pi_trace.py "$OUT/q3_pi.jsonl" > "$OUT/q3_pi.txt"
 
-grep -l "429\|レート制限" "$OUT"/q2_pi_inst.jsonl "$OUT"/q3_agent.txt "$OUT"/q3_pi.jsonl 2>/dev/null \
-  && echo "まだ 429 が出ています。数分あけて、もう一度実行してください" || echo "3件とも取得できました"
+# 失敗した実行は、Pi では stopReason が "error"、自作エージェントでは「レート制限」と出る
+if grep -q '"stopReason":"error"' "$OUT"/q2_pi_inst.jsonl "$OUT"/q3_pi.jsonl || grep -q "レート制限" "$OUT"/q3_agent.txt; then
+  echo "まだ 429 が出ています。数分あけて、もう一度実行してください"
+else
+  echo "3件とも取得できました"
+fi
