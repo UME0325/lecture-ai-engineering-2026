@@ -310,6 +310,15 @@ def generate_answers(cases: list[dict], wait: float = 1.0) -> list[dict]:
     for case in cases:
         result = agent.run_sync(case["question"], model=model)
         case["answer"] = str(result.output)
+        # 宿題（実装）: どのツールをどの引数で呼んだかも残す。「用語集を確認したか」をコードで判定するため
+        case["trace"] = [
+            {"tool": part.tool_name, "args": part.args_as_dict()}
+            for message in result.all_messages() for part in message.parts
+            if isinstance(part, ToolCallPart)
+        ]
+        usage = result.usage
+        case["usage"] = {"requests": usage.requests, "input_tokens": usage.input_tokens,
+                         "output_tokens": usage.output_tokens}
         print(".", end="", flush=True)
         time.sleep(wait)
     print()
@@ -343,7 +352,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.generate:
         try:
-            cases = generate_answers(cases)
+            cases = generate_answers(cases, wait=args.wait or 1.0)
         except ModelHTTPError as e:
             print(api_error_message(e.status_code, str(e.body)[:200]))
             raise SystemExit(1)
