@@ -1,0 +1,16 @@
+[tool call]   bash({"command": "find . -maxdepth 3 -not -path '*/.*'", "timeout": 30})
+[tool return] bash -> . ./scripts ./scripts/make_sft_dataset.py ./notebooks ./notebooks/lora_format_tuning.ipynb ./data ./data/glossary.json .…
+[tool call]   read({"offset": 1, "path": "data/glossary.json", "limit": null})
+[tool return] read -> {   "version": "2026-draft-1",   "note": "AIE2026 第1〜4回・第6回の用語集（たたき台）。講義スライド確定後に内容を差し替える。",   "terms": [     {       "id…
+[usage] turns(requests)=3 total_tokens=16163
+
+--- 最終回答 ---
+AIE2026の講座における「3レベル」とは、宿題の構成における以下の3段階のことを指します。
+
+1. **基礎**：講義内容の確認
+2. **実装**：自分でコードを書く
+3. **発展**：調査や試行
+
+これら3つのレベルのうち**どれか1つに取り組めばその回の宿題は完了**となります（原則として採点は行われません）。ご自身の現在の理解度や興味に合わせて、どのレベルに取り組むか選んで進めるとよいでしょう。
+
+関係する回：第1回
