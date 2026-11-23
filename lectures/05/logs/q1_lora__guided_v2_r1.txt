@@ -1,0 +1,25 @@
+[model] gemini-3.5-flash-lite
+第2回の講義資料によると、LoRAとQLoRAの仕組みについて以下のように説明されています。
+
+- **LoRAが固定するものと学習するもの**
+  - 元のモデルの重み（本体）は固定して学習せず、変化分を表す小さな行列（差分）だけを学習します（第2回・PDF p.52）。
+- **QLoRAが加えるもの**
+  - LoRAの手法に加えて、元の重みをさらに **4bit（数値を粗く保存）に圧縮** することを加えます（第2回・PDF p.51, p.52）。これにより、GPUのメモリをさらに節約して大きなモデルを調整できるようになります。
+
+本体をそのままにするか・圧縮するか、そしてどこを動かすかに着目して整理してみましょう。
+
+--- trace ---
+[tool call]   search_graph_guided({'query': 'LoRA 固定 学習 QLoRA 加える'})
+[tool return] search_graph_guided -> 候補 34 ページから選択（経由しないハブ用語: AIエンジニアリング, AIエージェント, API, LLM（大規模言語モデル）, RAG, ツール（Tool use / Function calling）, トークン, ファインチューニング, プロンプト）
+    seed  lec02-main-p052 · 第2回 PDF p.52 · LoRA と QLoRA ：大きなモデルも GPU 1 台で調整できる（距離 0.218・全文）
+    seed  lec02-main-p051 · 第2回 PDF p.51 · PEFT ：モデル全体ではなく、一部だけを学習する（距離 0.238・全文）
+    seed  lec02-main-p060 · 第2回 PDF p.60 · 今日の演習： QLoRA で出力形式を矯正し、効果を測る（距離 0.261・全文）
+    cand  lec02-main-p061 · 第2回 PDF p.61 · 演習の進め方と提出物（仮）（距離 0.287・1 hop・lec02-main-p060から 前後ページ・全文）
+    cand  lec02-main-p047 · 第2回 PDF p.47 · 根拠と諸説：知識の追加は RAG が効きやすい（距離 0.284・2 hop・lec02-main-p052から 共通用語: LoRA・全文）
+    cand  lec02-main-p054 · 第2回 PDF p.54 · 手本データの作り方：質問と、理想の回答の組を用意する（距離 0.298・2 hop・lec02-main-p052から 前後ページ → 前後ページ）
+    cand  lec02-main-p058 · 第2回 PDF p.58 · Fine-Tuning する前のチェックリスト（距離 0.306・2 hop・lec02-main-p052から 共通用語: LoRA）
+    cand  lec02-main-p053 · 第2回 PDF p.53 · チャットボットの場合：何を FT し、何を FT しないか（距離 0.329・1 hop・lec02-main-p052から 前後ページ）
+    cand  lec02-main-p059 · 第2回 PDF p.59 · 第 2 回のまとめ： 4 つの芯と、明日やること（距離 0.333・1 hop・lec02-main-p060から 前後ページ）
+[time] 回答完了まで 2.70 秒（検索・埋め込みを含む）
+[usage] 入力 4,333 tokens / 出力 201 tokens / モデル応答 2 回
+[cost] 生成APIの推定コスト: $0.001802 USD（埋め込み・索引構築分は含まない）

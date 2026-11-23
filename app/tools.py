@@ -126,3 +126,31 @@ def search_graph(query: str) -> str:
         return json.dumps({"error": str(e)}, ensure_ascii=False)
     except APIError as e:
         return json.dumps({"error": api_error_message(e.code)}, ensure_ascii=False)
+
+
+def search_graph_guided(query: str) -> str:
+    """資料を検索し、入口ページ（seeds）の全文と、関係をたどった候補ページ（candidates）の抜粋を返す。
+
+    queryに調べたい内容を指定する。candidatesは質問に近い順で、本文は冒頭の抜粋だけ。
+    根拠に使う候補は read_pages で全文を読んでから引用する。
+    """
+    import sqlite3
+    from google.genai.errors import APIError
+    from app.retrieval import search_graph_guided as search
+
+    try:
+        return json.dumps(search(query), ensure_ascii=False)
+    except (ValueError, OSError, sqlite3.Error) as e:
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
+    except APIError as e:
+        return json.dumps({"error": api_error_message(e.code)}, ensure_ascii=False)
+
+
+def read_pages(page_ids: list[str]) -> str:
+    """page_idを指定して、ページの全文と引用情報（回・PDFページ番号）を返す。一度に4ページまで。"""
+    from app.retrieval import read_pages as read
+
+    try:
+        return json.dumps(read(page_ids), ensure_ascii=False)
+    except (ValueError, OSError) as e:
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
