@@ -11,7 +11,11 @@ def parse(text: str) -> dict:
     usage = re.search(r"\[usage\] 入力 ([\d,]+) tokens / 出力 ([\d,]+) tokens / モデル応答 (\d+) 回", text)
     calls = re.findall(r"\[tool call\]\s+(\w+)\(", text)
     answer = text.split("--- trace ---")[0]
-    cited = sorted(set(re.findall(r"第(\d+)回[・\s]*PDF\s*p\.\s*(\d+)", answer)), key=lambda x: (int(x[0]), int(x[1])))
+    # 「第3回・PDF p.39, p.65」「第2回・PDF p.46, 53」のように、1つの回に複数ページを並べた書き方も拾う
+    cited = set()
+    for lecture, pages in re.findall(r"第(\d+)回[・\s]*PDF\s*(p\.\s*\d+(?:\s*[,、・]\s*(?:p\.\s*)?\d+)*)", answer):
+        cited.update((lecture, page) for page in re.findall(r"\d+", pages))
+    cited = sorted(cited, key=lambda x: (int(x[0]), int(x[1])))
     return {
         "time": get(r"\[time\] 回答完了まで ([\d.]+) 秒"),
         "in": usage.group(1) if usage else "", "out": usage.group(2) if usage else "",

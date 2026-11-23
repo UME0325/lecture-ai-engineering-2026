@@ -27,6 +27,7 @@ GUIDED_HUB_MAX_PAGES = 20      # これより多くのページに出る用語�
 GUIDED_HOP_PENALTY = 0.02      # 入口から1 hop遠いごとに、余弦距離へ足すペナルティ
 GUIDED_MAX_CANDIDATES = 6      # 先頭部分だけを見せる候補の数（全文は read_pages で読む）
 GUIDED_READ_MAX_PAGES = 4      # read_pages で1回に読めるページ数
+GUIDED_V2_AUTO_FULL_K = 2      # v2（--graph-guided-v2）: 候補の上位何件に、最初から全文を付けるか
 EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
 # 2,048トークンの上限に対し、タスク指定等の分を残す。超過時は切り捨てず停止する。

@@ -92,3 +92,29 @@ def test_guided_mode_wiring_with_test_model(monkeypatch):
     assert offered == {"search_graph_guided", "read_pages"}
     returns = [p for m in result.all_messages() for p in m.parts if isinstance(p, ToolReturnPart)]
     assert json.loads(returns[0].content) == hit
+
+
+@pytest.fixture
+def guided_v2(monkeypatch):
+    """v2 の設定を有効にし、テストが終わったら v1 の設定と渡し済みの記録を元に戻す。"""
+    monkeypatch.setitem(retrieval.GUIDED_OPTIONS, "auto_full_k", retrieval.GUIDED_V2_AUTO_FULL_K)
+    monkeypatch.setitem(retrieval.GUIDED_OPTIONS, "skip_reread", True)
+    monkeypatch.setattr(retrieval, "_delivered_full", set())
+
+
+def test_v2_attaches_full_text_to_top_candidates(memory_query, guided_v2):
+    result = retrieval.search_graph_guided("コンパクションとメモリの違い")
+    with_full = [c for c in result["candidates"] if "content" in c]
+    assert with_full == result["candidates"][:retrieval.GUIDED_V2_AUTO_FULL_K]
+    assert all("content" not in c for c in result["candidates"][retrieval.GUIDED_V2_AUTO_FULL_K:])
+
+
+def test_v2_does_not_resend_pages_already_delivered(memory_query, guided_v2):
+    result = retrieval.search_graph_guided("コンパクションとメモリの違い")
+    seed = result["seeds"][0]["page_id"]
+    preview_only = result["candidates"][-1]["page_id"]
+    read = retrieval.read_pages([seed, preview_only])
+    assert read["already_included"] == [seed]
+    assert [p["page_id"] for p in read["pages"]] == [preview_only]
+    # 一度読んだページも、2回目は本文を返さない
+    assert retrieval.read_pages([preview_only])["already_included"] == [preview_only]

@@ -19,6 +19,7 @@ from app.config import (
     RAG_DB, RAG_DOCUMENT_IDS, RAG_SOURCE, RAG_TOP_K, RAG_TREE, get_api_key,
     RAG_GRAPH, GRAPH_START_K, GRAPH_HOPS, GRAPH_MAX_RESULTS,
     GUIDED_HUB_MAX_PAGES, GUIDED_HOP_PENALTY, GUIDED_MAX_CANDIDATES, GUIDED_READ_MAX_PAGES,
+    GUIDED_V2_AUTO_FULL_K,
 )
 
 
@@ -199,6 +200,17 @@ def search_graph(query: str) -> dict:
 #   3. 入口（seeds）だけ全文、候補（candidates）は冒頭の抜粋だけ返し、全文は read_pages で読む
 # ---------------------------------------------------------------------------
 
+# v2（--graph-guided-v2）の切り替え。v1の結果を再現できるよう、既定は v1 の動き。
+#   auto_full_k:  候補の上位k件には最初から全文を付ける（読むかどうかをモデルに任せず、コードで決める）
+#   skip_reread:  すでに全文を渡したページを read_pages で求められたら、本文を返さずにそう伝える
+GUIDED_OPTIONS = {"auto_full_k": 0, "skip_reread": False}
+_delivered_full: set[str] = set()   # この実行でモデルに全文を渡したページ
+
+
+def enable_guided_v2() -> None:
+    GUIDED_OPTIONS.update(auto_full_k=GUIDED_V2_AUTO_FULL_K, skip_reread=True)
+
+
 def page_preview(page: dict, limit: int = 120) -> str:
     """ページ本文から、タイトルの繰り返しや章の見出し行を除いた冒頭を返す。
 
@@ -294,6 +306,9 @@ def search_graph_guided(query: str) -> dict:
                    "hops": len(routes[pid]) - 1, "via": via(routes[pid]), "from_seed": routes[pid][0],
                    "preview": page_preview(pages[pid])}
                   for _, pid in scored[:GUIDED_MAX_CANDIDATES]]
+    for candidate in candidates[:GUIDED_OPTIONS["auto_full_k"]]:
+        candidate["content"] = pages[candidate["page_id"]]["content"]
+    _delivered_full.update(item["page_id"] for item in seeds + candidates if "content" in item)
     return {"seeds": seeds, "candidates": candidates, "candidate_pool": len(routes),
             "skipped_hub_terms": sorted(hubs)}
 
@@ -310,7 +325,14 @@ def read_pages(page_ids: list[str]) -> dict:
     missing = [pid for pid in unique if pid not in pages]
     if missing:
         raise ValueError(f"対象のページが見つかりません: {', '.join(missing)}")
-    return {"pages": [{k: v for k, v in pages[pid].items() if k != "document_id"} for pid in unique]}
+    already = [pid for pid in unique if GUIDED_OPTIONS["skip_reread"] and pid in _delivered_full]
+    to_read = [pid for pid in unique if pid not in already]
+    _delivered_full.update(to_read)
+    result = {"pages": [{k: v for k, v in pages[pid].items() if k != "document_id"} for pid in to_read]}
+    if already:
+        result["already_included"] = already
+        result["note"] = "already_included のページは、検索結果ですでに全文（content）を渡しています。そちらを使ってください。"
+    return result
 
 
 
