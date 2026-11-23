@@ -22,6 +22,11 @@ RAG_TOP_K = 5
 GRAPH_START_K = 3
 GRAPH_HOPS = 2
 GRAPH_MAX_RESULTS = 10
+# 第5回 宿題（発展）: 質問との類似度で候補を選び直すGraph（--graph-guided）
+GUIDED_HUB_MAX_PAGES = 20      # これより多くのページに出る用語（ハブ）は経由しない
+GUIDED_HOP_PENALTY = 0.02      # 入口から1 hop遠いごとに、余弦距離へ足すペナルティ
+GUIDED_MAX_CANDIDATES = 6      # 先頭部分だけを見せる候補の数（全文は read_pages で読む）
+GUIDED_READ_MAX_PAGES = 4      # read_pages で1回に読めるページ数
 EMBEDDING_MODEL = "gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
 # 2,048トークンの上限に対し、タスク指定等の分を残す。超過時は切り捨てず停止する。

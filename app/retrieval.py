@@ -18,6 +18,7 @@ from app.config import (
     EMBEDDING_DIMENSIONS, EMBEDDING_MAX_TOKENS, EMBEDDING_MODEL,
     RAG_DB, RAG_DOCUMENT_IDS, RAG_SOURCE, RAG_TOP_K, RAG_TREE, get_api_key,
     RAG_GRAPH, GRAPH_START_K, GRAPH_HOPS, GRAPH_MAX_RESULTS,
+    GUIDED_HUB_MAX_PAGES, GUIDED_HOP_PENALTY, GUIDED_MAX_CANDIDATES, GUIDED_READ_MAX_PAGES,
 )
 
 
@@ -183,6 +184,133 @@ def search_graph(query: str) -> dict:
     expanded = [candidate for _, candidate in sorted(candidates.values())]
     return {"seeds": results, "expanded": expanded[:max(0, GRAPH_MAX_RESULTS - len(results))],
             "max_hops": GRAPH_HOPS}
+
+
+# ---------------------------------------------------------------------------
+# 第5回 宿題（発展）: 質問との類似度で候補を選び直すGraph ＋ Tree式の段階的な読み込み
+#
+# 元の search_graph の課題:
+#   1. 広げた候補の順番が「hop数→用語の接続数」で決まり、質問を見ていない
+#   2. 54ページに出る「AIエージェント」のようなハブ用語を経由すると、ほぼ無関係なページまで届く
+#   3. 入口と候補の最大10ページを全文で返すため、入力トークンが大きい
+# 改良:
+#   1. 候補は検索DBに保存済みのページ埋め込みと質問ベクトルの距離で並べ直す（追加のAPI呼び出しなし）
+#   2. GUIDED_HUB_MAX_PAGES より多くのページに出る用語は経由しない
+#   3. 入口（seeds）だけ全文、候補（candidates）は冒頭の抜粋だけ返し、全文は read_pages で読む
+# ---------------------------------------------------------------------------
+
+def page_preview(page: dict, limit: int = 120) -> str:
+    """ページ本文から、タイトルの繰り返しや章の見出し行を除いた冒頭を返す。
+
+    スライドの本文は「章の見出し→タイトル→要旨」の順で始まることが多い。
+    Treeのように先頭文だけを切り出すと、見出しやタイトルしか残らないページがあるため。
+    """
+    skip = {page["title"].strip(), page["section"].strip()}
+    lines = []
+    for line in page["content"].splitlines():
+        line = line.strip()
+        if not line or line in skip or re.fullmatch(r"\d+\s*/\s*\d+.*", line) and page["section"] in line:
+            continue
+        lines.append(line)
+    text = " ".join(lines)
+    return text if len(text) <= limit else text[:limit] + "…"
+
+
+def page_distances(query: str) -> dict[str, float]:
+    """質問を1回だけ埋め込み、検索DBの全ページとの余弦距離を返す（214ページなので全件でも軽い）。"""
+    if not isinstance(query, str) or not query.strip():
+        raise ValueError("検索語が空です。")
+    with open_index(RAG_DB) as db:
+        vector = embed_text(query.strip(), "RETRIEVAL_QUERY")
+        rows = db.execute("SELECT page_id, vec_distance_cosine(embedding, ?) AS distance FROM chunks",
+                          (sqlite_vec.serialize_float32(vector),))
+        return {row["page_id"]: row["distance"] for row in rows}
+
+
+def _guided_adjacency(pages: dict) -> tuple[dict, dict, set]:
+    """前後ページ・用語の関係から、ハブ用語を除いた隣接リストを作る。"""
+    graph = json.loads(RAG_GRAPH.read_text(encoding="utf-8"))
+    titles = {node["id"]: node["title"] for node in graph["nodes"]}
+    mentions = defaultdict(set)
+    for edge in graph["edges"]:
+        if edge["relation"] == "mentions" and edge["source"] in pages:
+            mentions[edge["target"]].add(edge["source"])
+    hubs = {term for term, members in mentions.items() if len(members) > GUIDED_HUB_MAX_PAGES}
+    adjacent = defaultdict(set)
+    for edge in graph["edges"]:
+        a, b = edge["source"], edge["target"]
+        if edge["relation"] == "next_page" and a in pages and b in pages:
+            adjacent[a].add(b)
+            adjacent[b].add(a)
+        elif edge["relation"] == "mentions" and a in pages and b in mentions and b not in hubs:
+            adjacent[a].add(b)
+            adjacent[b].add(a)
+    return adjacent, titles, {titles.get(h, h) for h in hubs}
+
+
+def search_graph_guided(query: str) -> dict:
+    """ベクトル検索の入口からグラフで候補を集め、質問との距離で選び直して抜粋だけ返す。"""
+    pages = {page["page_id"]: page for page in load_pages(RAG_SOURCE)}
+    distances = {pid: d for pid, d in page_distances(query).items() if pid in pages}
+    adjacent, titles, hubs = _guided_adjacency(pages)
+
+    ranked = sorted(distances, key=lambda pid: (distances[pid], pid))
+    seed_ids = ranked[:GRAPH_START_K]
+    # BFS で各ページへの最短経路を記録する（同じ深さなら接続先が少ない用語＝具体的な用語を優先）
+    routes = {}
+    for root in seed_ids:
+        queue, visited = deque([(root, [root])]), {root}
+        while queue:
+            current, path = queue.popleft()
+            if len(path) - 1 >= GRAPH_HOPS:
+                continue
+            for neighbor in sorted(adjacent[current], key=lambda n: (len(adjacent[n]), n)):
+                if neighbor in visited:
+                    continue
+                visited.add(neighbor)
+                route = path + [neighbor]
+                queue.append((neighbor, route))
+                if neighbor in pages and neighbor not in seed_ids:
+                    if neighbor not in routes or len(route) < len(routes[neighbor]):
+                        routes[neighbor] = route
+
+    def via(route):
+        """経路を「前後ページ」「共通用語: X」の言葉にする。"""
+        steps = []
+        for a, b in zip(route, route[1:]):
+            if a in pages and b in pages:
+                steps.append("前後ページ")
+            elif b not in pages:
+                steps.append(f"共通用語: {titles.get(b, b)}")
+        return " → ".join(steps)
+
+    scored = sorted(
+        ((distances[pid] + GUIDED_HOP_PENALTY * (len(route) - 1), pid) for pid, route in routes.items()),
+    )
+    cite = ("page_id", "lecture", "document_title", "section", "title", "page")
+    seeds = [{**{k: pages[pid][k] for k in cite}, "distance": round(distances[pid], 4),
+              "content": pages[pid]["content"]} for pid in seed_ids]
+    candidates = [{**{k: pages[pid][k] for k in cite}, "distance": round(distances[pid], 4),
+                   "hops": len(routes[pid]) - 1, "via": via(routes[pid]), "from_seed": routes[pid][0],
+                   "preview": page_preview(pages[pid])}
+                  for _, pid in scored[:GUIDED_MAX_CANDIDATES]]
+    return {"seeds": seeds, "candidates": candidates, "candidate_pool": len(routes),
+            "skipped_hub_terms": sorted(hubs)}
+
+
+def read_pages(page_ids: list[str]) -> dict:
+    """指定したページ（最大 GUIDED_READ_MAX_PAGES 件）の全文と引用情報を返す。重複は1回にまとめる。"""
+    pages = {page["page_id"]: page for page in load_pages(RAG_SOURCE)}
+    unique = list(dict.fromkeys(page_ids or []))
+    if not unique:
+        raise ValueError("page_ids が空です。search_graph_guided の candidates から page_id を選んでください。")
+    if len(unique) > GUIDED_READ_MAX_PAGES:
+        raise ValueError(f"一度に読めるのは {GUIDED_READ_MAX_PAGES} ページまでです（指定: {len(unique)}）。"
+                         "質問に必要なページに絞ってください。")
+    missing = [pid for pid in unique if pid not in pages]
+    if missing:
+        raise ValueError(f"対象のページが見つかりません: {', '.join(missing)}")
+    return {"pages": [{k: v for k, v in pages[pid].items() if k != "document_id"} for pid in unique]}
 
 
 
